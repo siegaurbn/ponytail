@@ -74,7 +74,7 @@ $('login').onsubmit = async event => {
       watch.onclick = async () => { watch.disabled = true; try { $('video').hidden = false; $('stop-video').hidden = false; await player.play(door.id); } catch (error) { showError(error); } finally { watch.disabled = false; } };
       section.append(open, watch); $('doors').append(section);
     }
-    $('login').hidden = true; $('token').value = ''; $('connection').textContent = 'Подключено'; $('portal').hidden = !portalUrl;
+    $('login').hidden = true; $('token').value = ''; $('connection').textContent = bootstrap.mode === 'demo' ? 'Демо · реле имитируются' : 'Подключено'; $('portal').hidden = !portalUrl;
     await refresh();
   } catch (error) { showError(error); }
 };

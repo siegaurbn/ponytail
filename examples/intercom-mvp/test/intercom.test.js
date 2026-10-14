@@ -139,3 +139,12 @@ test('WHEP keeps camera credentials private and scopes session deletion to its r
   assert.equal((await f.request(location, undefined, resident, 'DELETE')).status, 200); assert.equal(deletes, 1);
   mode = 'malicious'; assert.equal((await watch(resident)).status, 502);
 });
+test('duplicate active reports cannot extend a call beyond the lab time limit', async t => {
+  const f = await fixture(t), call = await f.ring();
+  await f.request(`/api/calls/${call.id}/answer`, { deviceId: f.deviceId });
+  const active = await f.request(`/api/calls/${call.id}/active`, { deviceId: f.deviceId });
+  f.advance(60000);
+  const duplicate = await f.request(`/api/calls/${call.id}/active`, { deviceId: f.deviceId });
+  assert.equal(duplicate.data.call.expiresAt, active.data.call.expiresAt);
+  f.advance(240001); assert.equal((await f.request(`/api/calls/${call.id}/active`, { deviceId: f.deviceId })).status, 410);
+});

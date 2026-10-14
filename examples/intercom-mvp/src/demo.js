@@ -12,7 +12,7 @@ const panels = Object.fromEntries(Object.entries(doors).map(([id, door]) => [id,
 const edge = createEdge({ token: edgeToken, panels, transport: async () => new Response('OK') });
 edge.listen(8091, '127.0.0.1', () => {
   const api = createApi({ users: [{ id: 'resident', token, doors: Object.keys(doors) }], doors, internalToken,
-    portalUrl: 'https://example.com/', mediaUrl: 'http://127.0.0.1:8889/',
+    mode: 'demo', portalUrl: 'https://example.com/', mediaUrl: 'http://127.0.0.1:8889/',
     edgeUnlock: (doorId, requestId) => jsonFetch('http://127.0.0.1:8091/unlock', { method: 'POST', headers: { Authorization: `Bearer ${edgeToken}` }, body: JSON.stringify({ doorId, requestId }) }), push: createPush({ demo: true }), audit: event => process.stdout.write(`${JSON.stringify(event)}\n`) });
   api.listen(8090, '127.0.0.1', () => console.log(`Demo: http://127.0.0.1:8090\nResident token: ${token}\nSimulated relays only. Create a call with scripts/ring.js.`));
   process.on('SIGINT', () => { api.close(); edge.close(); });

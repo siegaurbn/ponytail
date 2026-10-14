@@ -5,7 +5,7 @@ const { server, body, check, equalToken, bearer, jsonFetch, HttpError } = requir
 const { createPush } = require('./push');
 
 const idPattern = /^[a-zA-Z0-9-]{16,80}$/;
-function createApi({ users, doors, internalToken, portalUrl, mediaUrl, mediaAuthorization, edgeUnlock, push, audit = () => {}, now = Date.now }) {
+function createApi({ users, doors, internalToken, portalUrl, mediaUrl, mediaAuthorization, edgeUnlock, push, mode = 'integration', audit = () => {}, now = Date.now }) {
   check(internalToken?.length >= 24 && users.every(user => user.token?.length >= 24), 500, 'weak_api_token');
   const mediaBase = new URL(mediaUrl);
   const calls = new Map(), devices = new Map(), requests = new Map(), sessions = new Map(), limits = new Map();
@@ -68,7 +68,7 @@ function createApi({ users, doors, internalToken, portalUrl, mediaUrl, mediaAuth
     check(user, 401, 'unauthorized');
     const window = limits.get(user.id) || { count: 0, until: now() + 60000 };
     window.count++; limits.set(user.id, window); check(window.count <= 180, 429, 'rate_limited');
-    if (req.method === 'GET' && path === '/api/bootstrap') return { userId: user.id, portalUrl, doors: user.doors.map(id => ({ id, name: doors[id].name, vendor: doors[id].vendor })) };
+    if (req.method === 'GET' && path === '/api/bootstrap') return { mode, userId: user.id, portalUrl, doors: user.doors.map(id => ({ id, name: doors[id].name, vendor: doors[id].vendor })) };
     if (req.method === 'POST' && path === '/api/devices') {
       const data = await body(req);
       check(idPattern.test(data.deviceId) && ['ios', 'android'].includes(data.platform));
@@ -97,9 +97,8 @@ function createApi({ users, doors, internalToken, portalUrl, mediaUrl, mediaAuth
         check(!['ended', 'expired'].includes(call.state), 410, 'call_ended');
         check(!call.deviceId || call.deviceId === data.deviceId, 409, 'answered_elsewhere');
         if (match[2] === 'answer') { check(['ringing', 'answering'].includes(call.state), 409, 'invalid_call_state'); call.state = 'answering'; }
-        else { check(['answering', 'active'].includes(call.state) && call.deviceId === data.deviceId, 409, 'invalid_call_state'); call.state = 'active'; }
+        else { check(['answering', 'active'].includes(call.state) && call.deviceId === data.deviceId, 409, 'invalid_call_state'); if (call.state === 'answering') call.expiresAt = now() + 300000; call.state = 'active'; }
         call.deviceId = data.deviceId;
-        if (call.state === 'active') call.expiresAt = now() + 300000;
       }
       return { call };
     }
@@ -119,7 +118,7 @@ function createApi({ users, doors, internalToken, portalUrl, mediaUrl, mediaAuth
         if (outcome.status === 'accepted') return { method: 'http', status: 'accepted', requestId: data.requestId };
         if (outcome.status === 'unavailable' && data.callId && door.dtmf) {
           const call = callFor(user, data.callId);
-          check(call.doorId === doorId && call.state === 'active' && call.deviceId === data.deviceId, 409, 'dtmf_requires_active_call');
+          check(call.doorId === doorId && call.state === 'active' && call.expiresAt > now() && call.deviceId === data.deviceId, 409, 'dtmf_requires_active_call');
           check(/^[0-9A-D*#]{1,16}$/.test(door.dtmf), 500, 'invalid_dtmf_config');
           return { method: 'dtmf', status: 'authorized', digits: door.dtmf, sipCallId: call.sipCallId, requestId: data.requestId };
         }
