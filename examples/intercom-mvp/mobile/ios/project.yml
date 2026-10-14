@@ -1,5 +1,7 @@
 name: IntercomMvp
 options:
+  projectFormat: xcode15_0
+  xcodeVersion: '15.4'
   deploymentTarget:
     iOS: '16.0'
 targets:

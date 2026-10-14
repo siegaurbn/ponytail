@@ -136,7 +136,9 @@ function createApi({ users, doors, internalToken, portalUrl, mediaUrl, mediaAuth
       let sdp = '';
       for await (const chunk of req) { sdp += chunk; check(sdp.length <= 65536, 413, 'sdp_too_large'); }
       check(sdp.startsWith('v=0'), 400, 'invalid_sdp');
-      const upstream = await fetch(new URL(`${door.stream}/whep`, mediaBase), { method: 'POST', body: sdp, headers: { 'Content-Type': 'application/sdp', ...(mediaAuthorization ? { Authorization: mediaAuthorization } : {}) }, redirect: 'error', signal: AbortSignal.timeout(8000) });
+      let upstream;
+      try { upstream = await fetch(new URL(`${door.stream}/whep`, mediaBase), { method: 'POST', body: sdp, headers: { 'Content-Type': 'application/sdp', ...(mediaAuthorization ? { Authorization: mediaAuthorization } : {}) }, redirect: 'error', signal: AbortSignal.timeout(8000) }); }
+      catch { throw new HttpError(502, 'video_unavailable'); }
       check(upstream.status === 201, 502, 'video_unavailable');
       check(upstream.headers.get('location'), 502, 'invalid_media_location');
       const location = new URL(upstream.headers.get('location'), upstream.url);

@@ -45,6 +45,7 @@ public class App extends Application {
     } finally { connection.disconnect(); }
   }
   public void registerToken(String token) {
+    if (token.isEmpty()) return;
     settings.edit().putString("pushToken", token).apply();
     if (settings.getString("token", "").isEmpty()) return;
     worker.execute(() -> {

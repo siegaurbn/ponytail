@@ -19,7 +19,7 @@ public class CallManager {
   JSONObject call;
   Connection connection;
   boolean starting;
-  final Map<String, Runnable> completions = new HashMap<>();
+  final Map<String, java.util.function.Consumer<String>> completions = new HashMap<>();
   public CallManager(App app) {
     this.app = app; handle = new PhoneAccountHandle(new ComponentName(app, CallsService.class), "intercom");
     app.getSystemService(TelecomManager.class).registerPhoneAccount(new PhoneAccount.Builder(handle, "Домофон").setCapabilities(PhoneAccount.CAPABILITY_SELF_MANAGED).build());
@@ -79,15 +79,16 @@ public class CallManager {
     if (op == 0) throw new Exception();
     if (op == 1 && call == null) call = new JSONObject().put("callId", data.getString("callId")).put("sipCallId", sip);
     int error = Sip.command(op, sip, data.optString("digits"), op == 3 ? data.getString("requestId") : id);
-    if (op == 3) completions.put(data.getString("requestId"), () -> { if (app.activity != null) app.activity.result(id, null); });
-    else completions.put(id, () -> { if (app.activity != null) app.activity.result(id, null); });
+    String commandId = op == 3 ? data.getString("requestId") : id;
+    completions.put(commandId, failure -> { if (app.activity != null) app.activity.result(id, failure); });
+    app.handler.postDelayed(() -> { java.util.function.Consumer<String> pending = completions.remove(commandId); if (pending != null) pending.accept("SIP не ответил"); }, 12000);
     if (error != 0) { completions.remove(op == 3 ? data.getString("requestId") : id); if (app.activity != null) app.activity.result(id, "SIP действие недоступно: " + error); }
   }
   void event(String type, String sip, String id, int error) {
     if (type.equals("command")) {
-      Runnable completion = completions.remove(id);
-      if (error == 0 && completion != null) completion.run();
-      else if (error != 0) { if (app.activity != null) app.activity.notice("SIP действие завершилось с ошибкой: " + error); if (connection != null && connection.getState() != Connection.STATE_ACTIVE) hangup(); }
+      java.util.function.Consumer<String> completion = completions.remove(id);
+      if (completion != null) completion.accept(error == 0 ? null : "SIP ошибка: " + error);
+      if (error != 0) { if (app.activity != null) app.activity.notice("SIP действие завершилось с ошибкой: " + error); if (connection != null && connection.getState() != Connection.STATE_ACTIVE) hangup(); }
     }
     if (call != null && call.optString("sipCallId").equals(sip)) {
       if (type.equals("established")) {

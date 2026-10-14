@@ -28,7 +28,7 @@ window.intercomEvent = async event => {
   refresh().catch(showError);
 };
 const messages = { unauthorized: 'Неверный токен', door_forbidden: 'Нет доступа к двери', unlock_outcome_unknown: 'Результат открытия неизвестен. Проверьте дверь перед повтором.', http_unavailable: 'Открытие по HTTP недоступно', answered_elsewhere: 'Вызов принят на другом устройстве', video_unavailable: 'Камера недоступна', dtmf_requires_active_call: 'Для открытия нужен активный разговор' };
-function showError(error) { $('message').textContent = messages[error.message] || error.message; }
+function showError(error) { $('message').textContent = messages[error.message] || { internal_error: 'Временная ошибка сервиса', rate_limited: 'Слишком много запросов. Подождите минуту.' }[error.message] || error.message; }
 async function request(path, options = {}) {
   const response = await fetch(path, { ...options, headers: { ...options.headers, Authorization: `Bearer ${token}` } });
   if (!response.ok) { const data = await response.json().catch(() => ({})); throw new Error(data.error || 'Ошибка подключения'); }
