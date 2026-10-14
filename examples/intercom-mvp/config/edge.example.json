@@ -1,0 +1,8 @@
+{
+  "host": "127.0.0.1", "port": 8091,
+  "panels": {
+    "entrance": { "vendor": "akuvox", "baseUrl": "http://192.168.10.10/", "relay": 1, "username": "integration", "passwordEnv": "AKUVOX_PASSWORD", "commissioned": false, "successPattern": "REPLACE_WITH_OBSERVED_SUCCESS_RESPONSE" },
+    "gate": { "vendor": "dnake", "profile": "webapi", "baseUrl": "http://192.168.10.11/", "relay": 1, "username": "integration", "passwordEnv": "DNAKE_PASSWORD", "commissioned": false, "successPattern": "REPLACE_WITH_OBSERVED_SUCCESS_RESPONSE" },
+    "lobby": { "vendor": "bas-ip", "baseUrl": "http://192.168.10.12/", "relay": 1, "tokenEnv": "BAS_IP_TOKEN", "commissioned": false, "successPattern": "REPLACE_WITH_OBSERVED_SUCCESS_RESPONSE" }
+  }
+}

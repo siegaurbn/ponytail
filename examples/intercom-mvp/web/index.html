@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Домофон</title><link rel="stylesheet" href="/style.css">
+<main>
+  <header><h1>Домофон</h1><span id="connection">Подключение</span></header>
+  <form id="login"><label>Токен жителя <input id="token" type="password" required autocomplete="off"></label><button>Подключиться</button></form>
+  <p id="message" role="status" aria-live="polite"></p>
+  <section id="call" hidden aria-label="Вызов"><h2 id="caller"></h2><p id="call-state"></p><button id="answer">Ответить</button><button id="end">Завершить</button></section>
+  <video id="video" autoplay playsinline muted aria-label="Камера домофона" hidden></video>
+  <div id="doors"></div>
+  <button id="stop-video" hidden>Закрыть камеру</button><button id="portal" hidden>Личный кабинет</button>
+  <p class="hint">Браузер показывает двери и видео. Голос и фоновые вызовы доступны в мобильном приложении.</p>
+</main><script src="/whep.js"></script><script src="/app.js"></script>
+</html>

@@ -1,0 +1,30 @@
+name: IntercomMvp
+options:
+  deploymentTarget:
+    iOS: '16.0'
+targets:
+  IntercomMvp:
+    type: application
+    platform: iOS
+    sources: [Sources]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.ponytail.intercom
+        SWIFT_VERSION: '5.0'
+        SWIFT_OBJC_BRIDGING_HEADER: Sources/Bridge.h
+        HEADER_SEARCH_PATHS: '$(SRCROOT)/../../native'
+        LIBRARY_SEARCH_PATHS: '$(SRCROOT)/../../native/build-ios $(SRCROOT)/../../native/build-ios/_deps/baresip-build $(SRCROOT)/../../native/build-ios/_deps/libre-build'
+        OTHER_LDFLAGS: '-lintercom -lbaresip -lre -framework AudioToolbox -framework CoreAudio -lresolv'
+        CODE_SIGN_ENTITLEMENTS: Intercom.entitlements
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: Домофон MVP
+        UILaunchScreen: {}
+        NSMicrophoneUsageDescription: Для разговора с посетителем
+        UIBackgroundModes: [voip, audio]
+    dependencies:
+      - sdk: PushKit.framework
+      - sdk: CallKit.framework
+      - sdk: AVFoundation.framework
+      - sdk: WebKit.framework

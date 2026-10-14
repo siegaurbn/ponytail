@@ -1,0 +1,34 @@
+# Place this process at the edge, or reach the panels over a private VPN.
+logLevel: warn
+rtspAddress: 127.0.0.1:8554
+rtmp: false
+hls: false
+srt: false
+moq: false
+webrtc: true
+webrtcAddress: :8889
+webrtcLocalUDPAddress: :8189
+webrtcAdditionalHosts: [REPLACE_WITH_REACHABLE_EDGE_HOST]
+# A TURN service may be required on restrictive client networks.
+authMethod: internal
+authInternalUsers:
+  - user: backend
+    pass: REPLACE_WITH_RANDOM_MEDIA_PASSWORD
+    ips: []
+    permissions:
+      - action: read
+        path: entrance
+      - action: read
+        path: gate
+      - action: read
+        path: lobby
+paths:
+  entrance:
+    source: rtsp://REPLACE_USER:REPLACE_PASSWORD@192.168.10.10/REPLACE_PATH
+    sourceOnDemand: true
+  gate:
+    source: rtsp://REPLACE_USER:REPLACE_PASSWORD@192.168.10.11/REPLACE_PATH
+    sourceOnDemand: true
+  lobby:
+    source: rtsp://REPLACE_USER:REPLACE_PASSWORD@192.168.10.12/REPLACE_PATH
+    sourceOnDemand: true

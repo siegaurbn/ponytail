@@ -15,3 +15,7 @@ median-of-10 numbers: [../benchmarks/](../benchmarks/).
 | [CSV Sum](csv-sum.md) | 20 | 3 |
 | [Countdown Timer](react-countdown.md) | 267 | 9 |
 | [Rate Limiting](rate-limit.md) | 128 | 10 |
+
+## Application example
+
+[Intercom MVP](intercom-mvp/) is a standalone application built using the skill: a dependency-free Node API/edge agent, libbaresip mobile voice, native call lifecycle, and MediaMTX video. It is separate from the benchmark outputs above and is not part of the published plugin.

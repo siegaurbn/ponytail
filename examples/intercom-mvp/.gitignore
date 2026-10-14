@@ -1,0 +1,11 @@
+config/local*.json
+mobile/android/.gradle/
+mobile/android/**/build/
+mobile/android/**/.cxx/
+mobile/android/local.properties
+mobile/android/app/google-services.json
+mobile/ios/*.xcodeproj/
+native/build*/
+native/deps/
+*.xcframework/
+secrets/
