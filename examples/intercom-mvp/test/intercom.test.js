@@ -13,7 +13,7 @@ async function fixture(t, outcome = { status: 'accepted' }, mediaUrl = 'http://1
   const api = createApi({ users: [{ id: 'resident', token: resident, doors: ['door'] }, { id: 'other', token: stranger, doors: [] }],
     doors: { door: { name: 'Door', vendor: 'akuvox', stream: 'door', dtmf: '#' } }, internalToken: internal,
     mediaUrl, mediaAuthorization: 'Basic internal-media-only', portalUrl: 'https://example.com/', now: () => time,
-    edgeUnlock: async () => { attempts++; await new Promise(resolve => setTimeout(resolve, 10)); return outcome; },
+    edgeUnlock: async (doorId, requestId) => { assert.equal(requestId.length, 64); attempts++; await new Promise(resolve => setTimeout(resolve, 10)); return outcome; },
     push: async () => { pushes++; return { delivered: true }; }, audit: event => audit.push(event) });
   await new Promise(resolve => api.listen(0, '127.0.0.1', resolve));
   t.after(() => new Promise(resolve => api.close(resolve)));
@@ -45,6 +45,7 @@ test('concurrent HTTP unlocks execute once; reusing an ID for another payload fa
   assert.ok(results.every(x => x.status === 200 && x.data.method === 'http'));
   assert.equal(f.attempts(), 1);
   assert.equal((await f.request('/api/doors/door/unlock', { requestId, callId: randomUUID() })).status, 409);
+  assert.equal((await f.request('/api/doors/door/unlock', { requestId: 'a'.repeat(80) })).status, 200);
   assert.ok(!JSON.stringify(f.audit).includes(resident));
 });
 test('DTMF requires the authorized active call and the answering device', async t => {

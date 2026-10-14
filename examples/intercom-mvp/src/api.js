@@ -1,6 +1,6 @@
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
-const { randomUUID } = require('node:crypto');
+const { randomUUID, createHash } = require('node:crypto');
 const { server, body, check, equalToken, bearer, jsonFetch, HttpError } = require('./http');
 const { createPush } = require('./push');
 
@@ -112,7 +112,7 @@ function createApi({ users, doors, internalToken, portalUrl, mediaUrl, mediaAuth
       check(requests.size < 2000, 503, 'unlock_busy');
       const result = (async () => {
         let outcome;
-        try { outcome = await edgeUnlock(doorId, `${user.id}-${data.requestId}`); }
+        try { outcome = await edgeUnlock(doorId, createHash('sha256').update(JSON.stringify([user.id, data.requestId])).digest('hex')); }
         catch { outcome = { status: 'unknown' }; }
         audit({ event: 'unlock', userId: user.id, doorId, requestId: data.requestId, status: outcome.status });
         if (outcome.status === 'accepted') return { method: 'http', status: 'accepted', requestId: data.requestId };
