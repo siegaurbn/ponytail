@@ -19,6 +19,8 @@ window.intercomResult = (id, error, value) => {
   error ? pending.reject(new Error(error)) : pending.resolve(value);
 };
 window.intercomEvent = async event => {
+  if (['registration_failed', 'sip_error'].includes(event.type)) $('message').textContent = 'Голосовая связь не подключена. Проверьте настройки SIP.';
+  if (event.type === 'push_registration_failed') $('message').textContent = 'Фоновые вызовы не подключены. Проверьте настройки push.';
   if (event.type === 'established' && currentCall?.sipCallId === event.sipCallId) {
     await api(`/api/calls/${currentCall.id}/active`, { deviceId }).catch(showError);
   }

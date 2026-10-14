@@ -119,7 +119,7 @@ MediaMTX: use the separately installed, MIT-licensed server with `config/mediamt
 
 ### Android
 
-JDK 17+, Android SDK 35, NDK `28.2.13676358`, CMake `3.22.1`; Gradle wrapper is included. libbaresip/libre and Mbed TLS (crypto primitives only) are fetched at pinned revisions. No proprietary SIP SDK.
+JDK 17+, Android SDK 35, Android 9+ (API 28), NDK `28.2.13676358`, CMake `3.22.1`; Gradle wrapper is included. libbaresip/libre and Mbed TLS (crypto primitives only) are fetched at pinned revisions. No proprietary SIP SDK.
 
 ```sh
 cd mobile/android
@@ -140,10 +140,10 @@ cmake -S . -B build-ios -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_SYSROOT=iphonesimula
 cmake --build build-ios --target intercom -j 3
 cd ../mobile/ios
 xcodegen generate
-xcodebuild -project IntercomMvp.xcodeproj -scheme IntercomMvp -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+xcodebuild -project IntercomMvp.xcodeproj -scheme IntercomMvp -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' ARCHS=arm64 CODE_SIGNING_ALLOWED=NO build
 ```
 
-For a device use `iphoneos`, rebuild libraries for arm64, and select your signing team/bundle ID. Enable Push Notifications, supply APNs keys/topic on the backend, and align `aps-environment` with sandbox/production. A real device and signing are required to validate background PushKit delivery. Configure an HTTPS API; ATS stays enabled. SIP and API credentials use Keychain after-first-unlock storage. The personal account loads in a separate WKWebView; no privileged handler or resident token is forwarded to it. The shared UI requires a fresh token login after its WebView is recreated; native call handling uses the stored token.
+For an Intel simulator replace arm64 with x86_64 in both commands. For a device use `iphoneos`, rebuild libraries for arm64, and select your signing team/bundle ID. Enable Push Notifications, supply APNs keys/topic on the backend, and align `aps-environment` with sandbox/production. A real device and signing are required to validate background PushKit delivery. Configure an HTTPS API; ATS stays enabled. SIP and API credentials use Keychain after-first-unlock storage. The personal account loads in a separate WKWebView; no privileged handler or resident token is forwarded to it. The shared UI requires a fresh token login after its WebView is recreated; native call handling uses the stored token. A small compatibility function reports unsupported client-certificate loading because libre 4.12 omits that TLS-stub symbol on Apple; remove it when upgrading to a backend that provides the symbol.
 
 ## Validation and limits
 
