@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+  <uses-permission android:name="android.permission.MANAGE_OWN_CALLS"/>
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+  <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL"/>
+  <application android:name=".App" android:label="Домофон MVP" android:icon="@drawable/icon" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:dataExtractionRules="@xml/data_extraction" android:networkSecurityConfig="@xml/network_security">
+    <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop">
+      <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+    </activity>
+    <service android:name=".PushService" android:exported="false"><intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT"/></intent-filter></service>
+    <service android:name=".CallsService" android:exported="true" android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"><intent-filter><action android:name="android.telecom.ConnectionService"/></intent-filter></service>
+    <service android:name=".CallForegroundService" android:exported="false" android:foregroundServiceType="phoneCall"/>
+  </application>
+</manifest>

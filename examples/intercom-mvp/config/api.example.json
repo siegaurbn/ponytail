@@ -1,0 +1,16 @@
+{
+  "host": "127.0.0.1", "port": 8090,
+  "portalUrl": "https://account.example.com/",
+  "mediaUrl": "http://127.0.0.1:8889/",
+  "users": [{ "id": "resident", "tokenEnv": "RESIDENT_TOKEN", "doors": ["entrance", "gate", "lobby"] }],
+  "edges": { "building": "http://127.0.0.1:8091/" },
+  "doors": {
+    "entrance": { "name": "Entrance", "vendor": "akuvox", "stream": "entrance", "edge": "building", "dtmf": "#" },
+    "gate": { "name": "Gate", "vendor": "dnake", "stream": "gate", "edge": "building", "dtmf": "0" },
+    "lobby": { "name": "Lobby", "vendor": "bas-ip", "stream": "lobby", "edge": "building", "dtmf": "*" }
+  },
+  "push": {
+    "apns": { "keyFile": "./secrets/AuthKey.p8", "keyId": "REPLACE", "teamId": "REPLACE", "bundleId": "dev.ponytail.intercom", "sandbox": true },
+    "fcmServiceAccount": "./secrets/firebase-service-account.json"
+  }
+}

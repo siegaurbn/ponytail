@@ -1,0 +1,12 @@
+{
+  "name": "ponytail-intercom-mvp",
+  "private": true,
+  "scripts": {
+    "start": "node src/demo.js",
+    "api": "node src/api.js",
+    "edge": "node src/edge.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": { "node": ">=22" },
+  "license": "MIT"
+}
